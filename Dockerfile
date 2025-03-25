@@ -35,21 +35,21 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 # upgrade avr-gcc... for reasons?
 ARG TARGETPLATFORM
-RUN /bin/bash -c "if [ \"$TARGETPLATFORM\" != 'linux/arm64' ]; then \
-        set -o pipefail && \
-        wget -q https://github.com/ZakKemble/avr-gcc-build/releases/download/v14.1.0-1/avr-gcc-14.1.0-x64-linux.tar.bz2 -O - | tee /tmp/asdf.tar.bz2 | md5sum -c <(echo 'a1a88c3d375d2fb6f428b743f79b8f69  -') && \
-        tar xfj /tmp/asdf.tar.bz2 --strip-components=1 -C / && \
+RUN if [ \"$TARGETPLATFORM\" != 'linux/arm64' ]; then \
+        echo 'a1a88c3d375d2fb6f428b743f79b8f69  -' > /tmp/md5sum.txt && \
+        wget -q https://github.com/ZakKemble/avr-gcc-build/releases/download/v14.1.0-1/avr-gcc-14.1.0-x64-linux.tar.bz2 -O - | tee /tmp/asdf.tar.bz2 | md5sum -c /tmp/md5sum.txt && \
+        tar xfj /tmp/asdf.tar.bz2 -C / && \
         rm -rf /share/ /tmp/*; \
-    fi"
+    fi
 
 # except on platforms we cannot...
-RUN /bin/bash -c "if [ \"$TARGETPLATFORM\" == 'linux/arm64' ]; then \
+RUN if [ \"$TARGETPLATFORM\" == 'linux/arm64' ]; then \
         apt-get update && apt-get install --no-install-recommends -y \
             avr-libc \
             binutils-avr \
             gcc-avr \
         && rm -rf /var/lib/apt/lists/*; \
-    fi"
+    fi
 
 # Install python packages
 RUN pipx install nose2
