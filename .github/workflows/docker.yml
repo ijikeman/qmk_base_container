@@ -2,12 +2,16 @@
 
 name: Build/Upload Docker Container
 
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches:
+#       - 'master'
+#   pull_request:
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - 'master'
-  pull_request:
+    tags:
+      - '*'
 
 jobs:
   docker:
@@ -40,9 +44,12 @@ jobs:
 
       - name: Build and Push to Registries
         uses: docker/build-push-action@v6
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ghcr.io/qmk/qmk_base_container:latest
-            qmkfm/base_container:latest
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ${{ github.repository }}:latest
+            ${{ github.repository }}:${{ github.ref_name }}
