@@ -2,16 +2,14 @@
 
 name: Build/Upload Docker Container
 
-# on:
-#   workflow_dispatch:
-#   push:
-#     branches:
-#       - 'master'
-#   pull_request:
 on:
   push:
     tags:
       - '*'
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   docker:
