@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 # For exec qmk_install.sh
     sudo \
 # For exec qmk setup
-    pipx \
+    python3-venv \
     zip && rm -rf /var/lib/apt/lists/*
 
 # upgrade avr-gcc... for reasons?
@@ -52,6 +52,8 @@ RUN if [ "$TARGETPLATFORM" == 'linux/arm64' ]; then \
     fi
 
 # Install python packages
-RUN pipx install nose2
-RUN pipx install yapf
-RUN pipx install flake8
+RUN python3 -m venv /.venv
+ENV PATH="/.venv/bin:$PATH"
+# Install python packages
+RUN python3 -m pip install --upgrade pip setuptools wheel
+RUN python3 -m pip install nose2 yapf flake8
